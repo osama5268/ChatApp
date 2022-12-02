@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<!-- <body class="bg-sky-900 text-white"> -->
+
+<body>
+    <div id="username" class="hidden" th:text="${session.username}"></div>
+    <div class=" container flex h-screen shadow-lg m-auto">
+        <div class="container h-full w-2/5">
+            <div class="nav flex justify-between">
+                <h1 class="text-4xl ml-3    ">ChatVerse</h1>
+                <div class="menu mr-4 mt-2 hover:cursor-pointer" onclick="show(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </div>
+            </div>
+            <div class="menu-items ml-3 mt-2" style="display: none;">
+                <form action="logout" class="logout mb-2 hover:shadow-md"><button
+                        class="logout menu-item w-full text-left">Logout</button>
+                </form>
+                <div class="requestS menu-item mb-2 hover:shadow-md hover:cursor-pointer" onclick="show(this)">
+                    <span>Requests</span> <span class="ml-4 px-1 rounded-full bg-sky-600 text-white"
+                        th:text=${#lists.size(requests)}></span>
+                </div>
+                <ul class="requests" style="display: none;">
+                    <li th:each="request: ${requests}">
+                        <div class="flex"><span class="w-2/5" th:text="${request.userFrom.username}"></span>
+                            <form class="ml-8 text-sm"
+                                th:action="@{/requests/accept/{requestid}(requestid=${request.id})}" th:method="post">
+                                <button
+                                    class="px-2 border border-solid border-green-600 hover:bg-green-600 hover:text-white">Accept</button>
+                            </form>
+                            <form class="ml-4 text-sm"><button
+                                    class="px-2 border border-solid border-red-600 hover:bg-red-600 hover:text-white">Reject</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+                <div class="sendRequest menu-item mb-2 hover:shadow-md hover:cursor-pointer" onclick="show(this)">
+                    Add a
+                    friend </div>
+                <form class="sendrequest" action="sendrequest" method="post" style="display: none;">
+                    <input
+                        class="px-4 py-1 text-md font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                        type="text" name="username" id="username" placeholder="username" required>
+                    <button class="bg-sky-600 text-white my-2 px-2">Send friend request</button>
+                </form>
+                <hr>
+            </div>
+            <!-- we will show list of friends  -->
+            <div class="m-4 mt-8">
+                <ul class="friends-list">
+                    <li th:each="friend: ${friends}">
+                        <div
+                            class="friend border-solid border-sky-600 border-2 rounded-md my-3 flex py-3 px-3 hover:shadow-md space-x-4">
+                            <div class="avatar rounded-full border-solid border-2 border-sky-600 p-1 px-3 font-bold"
+                                th:text="${#strings.capitalize(friend.username[0])}">
+
+                            </div>
+                            <div class="friend-name text-xl" th:text="${friend.username}"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="container w-full h-full flex flex-col p-3 space-y-4">
+            <div class="nav-2  p-3 text-xl w-fit py-2 px-6 rounded-full border border-sky-600 border-solid "
+                style="height:46px;">
+                <div class="name"></div>
+            </div>
+            <div
+                class="chat-window h-5/6 display-fixed overflow-auto flex flex-col-reverse min-w-full border-2 border-sky-600 border-solid rounded-md">
+            </div>
+            <div class="message h-1/6">
+                <form class="message-form">
+                    <input
+                        class="message-text w-11/12 px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                        type="text" placeholder="message" name="message" autocomplete="off">
+                    <button class="send-icon">
+                        <div class=" ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function show(clickedElement) {
+            // const menuButton = document.querySelector('.menu-items');
+            let element;
+            if (clickedElement.classList[0] == 'menu') {
+                element = document.querySelector('.menu-items');
+            }
+            else if (clickedElement.classList[0] == 'requestS') {
+                element = document.querySelector('.requests');
+            }
+            else {
+                element = document.querySelector('.sendrequest');
+            }
+            let currentState = element.style.display;
+            if (currentState == 'none')
+                currentState = 'block';
+            else
+                currentState = 'none';
+            element.style.display = currentState;
+        }
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="chat.js"></script>
+
+</body>
+
+</html>

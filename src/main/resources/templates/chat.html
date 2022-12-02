@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="ISO-8859-1">
+	<title>Chat</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="chat.css">
+</head>
+
+<body>
+	<div id="username" th:text="${session.username}" style="display: hidden;"></div>
+	<div class="left-container">
+		<div class="nav">
+			<h1>ChatVerse</h1>
+			<div class="menu" onclick="show(this)">
+				<i class="fa-solid fa-bars"></i>
+			</div>
+		</div>
+		<div class="menu-items" style="display: none;">
+			<form action="logout"><button class="logout menu-item">Logout</button></form>
+			<div class="requestS menu-item" onclick="show(this)">Requests</div>
+			<ul class="requests" style="display: none;">
+				<li th:each="request: ${requests}"><span th:text="${request.userFrom.username}"></span>
+					<form th:action="@{/requests/accept/{requestid}(requestid=${request.id})}" th:method="post">
+						<button>Accept</button>
+					</form>
+					<form><button>Reject</button></form>
+				</li>
+			</ul>
+			<div class="sendRequest menu-item" onclick="show(this)"> Add a friend </div>
+			<form class="sendrequest" action="sendrequest" method="post" style="display: none;">
+				<input type="text" name="username" id="username" placeholder="username">
+				<button>Send friend request</button>
+			</form>
+			<hr>
+		</div>
+		<ul class="friends-list">
+			<li th:each="friend: ${friends}">
+				<div class="friend">
+					<div class="avatar"><span class="avatar-letter"
+							th:text="${#strings.capitalize(friend.username[0])}"></span></div>
+					<div class="friend-name" th:text="${friend.username}"></div>
+				</div>
+			</li>
+		</ul>
+		<!-- we will show list of friends  -->
+	</div>
+	<div class="right-container">
+		<div class="nav-2">
+			<span class="name"></span>
+			<!-- <div class="menu" onclick="show(this)"> -->
+			<i class="fa-solid fa-bars"></i>
+			<!-- </div> -->
+		</div>
+		<div class="chat-window">
+
+		</div>
+		<div class="message">
+			<form class="message-form">
+				<input class="message-text" type="text" placeholder="message" name="message" autocomplete="off">
+				<button class="send-icon">Send</button>
+			</form>
+		</div>
+	</div>
+
+
+
+
+
+	<script>
+		function show(clickedElement) {
+			// const menuButton = document.querySelector('.menu-items');
+			let element;
+			if (clickedElement.classList[0] == 'menu') {
+				element = document.querySelector('.menu-items');
+			}
+			else if (clickedElement.classList[0] == 'requestS') {
+				element = document.querySelector('.requests');
+			}
+			else {
+				element = document.querySelector('.sendrequest');
+			}
+			let currentState = element.style.display;
+			if (currentState == 'none')
+				currentState = 'block';
+			else
+				currentState = 'none';
+			element.style.display = currentState;
+		}
+	</script>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<script src="chat.js"></script>
+	<script src="https://kit.fontawesome.com/9c0653aa28.js" crossorigin="anonymous"></script>
+
+</body>
+
+</html>
